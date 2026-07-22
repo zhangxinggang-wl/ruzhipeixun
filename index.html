@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>入职教师课标测试</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: #f5f6fa;
+  color: #333;
+  min-height: 100vh;
+}
+/* Home */
+.home-container {
+  max-width: 720px; margin: 0 auto; padding: 40px 20px;
+}
+.home-header {
+  text-align: center; margin-bottom: 40px;
+}
+.home-header h1 {
+  font-size: 28px; color: #1a1a2e; margin-bottom: 8px;
+}
+.home-header p {
+  font-size: 15px; color: #666;
+}
+.subject-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+.subject-card {
+  background: #fff; border-radius: 12px; padding: 28px 20px;
+  text-align: center; cursor: pointer; transition: all 0.25s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 2px solid transparent;
+  text-decoration: none; color: inherit; display: block;
+}
+.subject-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  border-color: #4a6cf7;
+}
+.subject-card .icon {
+  font-size: 40px; margin-bottom: 10px;
+}
+.subject-card .name {
+  font-size: 20px; font-weight: 700; color: #1a1a2e;
+}
+.subject-card .info {
+  font-size: 13px; color: #999; margin-top: 6px;
+}
+/* Test */
+.test-container {
+  max-width: 800px; margin: 0 auto; padding: 30px 20px 60px;
+}
+.test-header {
+  background: #fff; border-radius: 12px; padding: 24px 28px;
+  margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px;
+}
+.test-header h2 {
+  font-size: 22px; color: #1a1a2e;
+}
+.test-header .back-btn {
+  background: #eef0f7; border: none; padding: 8px 18px;
+  border-radius: 8px; cursor: pointer; font-size: 14px; color: #555;
+  transition: background 0.2s;
+}
+.test-header .back-btn:hover { background: #dde0eb; }
+.section {
+  background: #fff; border-radius: 12px; padding: 24px 28px;
+  margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.section-title {
+  font-size: 17px; font-weight: 700; color: #4a6cf7;
+  margin-bottom: 16px; padding-bottom: 10px;
+  border-bottom: 2px solid #eef0f7;
+}
+.question {
+  margin-bottom: 22px; padding-bottom: 18px;
+  border-bottom: 1px dashed #eee;
+}
+.question:last-child { border-bottom: none; margin-bottom: 0; }
+.question .q-title {
+  font-size: 15px; font-weight: 600; color: #333; margin-bottom: 10px;
+}
+.question .q-score {
+  font-size: 12px; color: #999; font-weight: 400;
+  margin-left: 6px;
+}
+.question .q-info {
+  font-size: 12px; color: #999; margin-bottom: 6px;
+}
+.options label {
+  display: block; padding: 8px 12px; margin: 4px 0;
+  border-radius: 8px; cursor: pointer; transition: background 0.15s;
+  font-size: 14px;
+}
+.options label:hover { background: #f0f4ff; }
+.options input[type="radio"] { margin-right: 8px; }
+.input-field {
+  width: 100%; padding: 10px 14px; border: 1.5px solid #ddd;
+  border-radius: 8px; font-size: 14px; transition: border-color 0.2s;
+  font-family: inherit;
+}
+.input-field:focus { outline: none; border-color: #4a6cf7; }
+textarea.input-field { min-height: 100px; resize: vertical; }
+.submit-wrap {
+  text-align: center; margin: 30px 0;
+}
+.submit-btn {
+  background: #4a6cf7; color: #fff; border: none;
+  padding: 14px 48px; border-radius: 10px; font-size: 17px;
+  cursor: pointer; font-weight: 600; transition: all 0.25s;
+}
+.submit-btn:hover { background: #3b5de7; transform: translateY(-1px); }
+.submit-btn:disabled { background: #bbb; cursor: not-allowed; transform: none; }
+/* Result */
+.result-box {
+  background: #fff; border-radius: 12px; padding: 28px;
+  margin-top: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  text-align: center;
+}
+.result-box h3 { font-size: 22px; margin-bottom: 12px; }
+.result-score {
+  font-size: 48px; font-weight: 800; color: #4a6cf7;
+  margin: 10px 0;
+}
+.result-detail {
+  font-size: 14px; color: #666; margin-top: 8px;
+}
+.result-detail span { font-weight: 600; }
+.correct { color: #27ae60; }
+.wrong { color: #e74c3c; }
+.ref-answer {
+  margin-top: 20px; padding: 16px; background: #f8f9fc;
+  border-radius: 8px; text-align: left;
+}
+.ref-answer h4 { font-size: 15px; margin-bottom: 8px; color: #555; }
+.ref-item {
+  margin-bottom: 12px; padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+.ref-item:last-child { border-bottom: none; }
+.ref-q { font-weight: 600; font-size: 14px; }
+.ref-a { font-size: 13px; color: #666; margin-top: 4px; }
+.correction-item {
+  margin: 6px 0; font-size: 13px;
+}
+/* Responsive */
+@media (max-width: 600px) {
+  .home-header h1 { font-size: 22px; }
+  .subject-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .subject-card { padding: 20px 12px; }
+  .subject-card .name { font-size: 17px; }
+  .test-container { padding: 16px 10px 40px; }
+  .section, .test-header { padding: 16px; }
+  .result-score { font-size: 36px; }
+}
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<script>
+const SUBJECT_DATA = {"地理": [{"type": "填空题", "title": "姓名：", "options": [], "answer": "人工批阅", "score": 0}, {"type": "填空题", "title": "工号/教师编号：", "options": [], "answer": "人工批阅", "score": 0}, {"type": "单选题", "title": "您本次参加的是哪科课标测试？", "options": ["地理", "其他学科"], "answer": "A", "score": 0}, {"type": "单选题", "title": "下列不属于地理核心素养的是？", "options": ["人地协调观", "综合思维", "区域认知", "数学运算"], "answer": "D", "score": 4}, {"type": "单选题", "title": "高中地理课程结构为？", "options": ["必修、选择性必修、选修", "自然与人文", "中国与世界", "地图与理论"], "answer": "A", "score": 4}, {"type": "单选题", "title": "必修学分？", "options": ["4", "6", "8", "10"], "answer": "A", "score": 4}, {"type": "单选题", "title": "2025修订新增？", "options": ["双碳战略与乡村振兴", "取消区域", "仅记地名", "减学时"], "answer": "A", "score": 4}, {"type": "单选题", "title": "学业质量水平级数？", "options": ["3", "4", "5", "6"], "answer": "C", "score": 4}, {"type": "单选题", "title": "高考参照水平？", "options": ["一二", "三四", "五", "无"], "answer": "B", "score": 4}, {"type": "单选题", "title": "地理实践力强调？", "options": ["野外考察", "仅背书", "不做图", "纯听讲"], "answer": "A", "score": 4}, {"type": "单选题", "title": "选修定位？", "options": ["共同基础", "升学预备", "拓展兴趣", "替代"], "answer": "C", "score": 4}, {"type": "单选题", "title": "人地协调观属？", "options": ["核心素养", "淘汰", "仅必修一", "不考"], "answer": "A", "score": 4}, {"type": "单选题", "title": "国土空间规划内容进？", "options": ["修订版课程", "移除", "仅大学", "不评"], "answer": "A", "score": 4}, {"type": "填空题", "title": "必修地理______学分。", "options": [], "answer": "4", "score": 4}, {"type": "填空题", "title": "选择性必修上限______学分。", "options": [], "answer": "12", "score": 4}, {"type": "填空题", "title": "地理核心素养有______个。", "options": [], "answer": "4", "score": 4}, {"type": "填空题", "title": "四大领域含______。", "options": [], "answer": "自然地理", "score": 4}, {"type": "填空题", "title": "2025修订融______理念。", "options": [], "answer": "生态文明", "score": 4}, {"type": "填空题", "title": "合格考水平______。", "options": [], "answer": "二", "score": 4}, {"type": "填空题", "title": "GIS属______应用领域。", "options": [], "answer": "地理信息", "score": 4}, {"type": "填空题", "title": "综合思维含要素______。", "options": [], "answer": "综合", "score": 4}, {"type": "填空题", "title": "区域认知需辨______差异。", "options": [], "answer": "区域", "score": 4}, {"type": "填空题", "title": "教学实践重______力。", "options": [], "answer": "实践", "score": 4}, {"type": "简答题", "title": "说明四维核心素养，并以\"黄土高原治理\"课例落实。", "options": [], "answer": "人地协调观、综合思维、区域认知、地理实践力。课例：分析人地矛盾树立协调观；水土气综合思维；定位北方区域认知；野外采样实践力。", "score": 10}, {"type": "简答题", "title": "地理教学如何服务\"乡村振兴\"国家战略？", "options": [], "answer": "开展乡村产业区位调查；用GIS做聚落演变；在国土空间内容中渗透村镇规划意识；培养知农爱农情怀。", "score": 10}], "化学": [{"type": "填空题", "title": "姓名：", "options": [], "answer": "人工批阅", "score": 0}, {"type": "填空题", "title": "工号/教师编号：", "options": [], "answer": "人工批阅", "score": 0}, {"type": "单选题", "title": "您本次参加的是哪科课标测试？", "options": ["化学", "其他学科"], "answer": "A", "score": 0}, {"type": "单选题", "title": "下列不属于化学学科核心素养的是？", "options": ["宏观辨识与微观探析", "变化观念与平衡思想", "证据推理与模型认知", "几何直观与运算"], "answer": "D", "score": 4}, {"type": "单选题", "title": "普通高中化学课程结构为？", "options": ["必修、选择性必修、选修", "初级、中级、高级", "理论课与实验课", "必学与选学"], "answer": "A", "score": 4}, {"type": "单选题", "title": "必修化学学分是？", "options": ["4", "6", "8", "10"], "answer": "A", "score": 4}, {"type": "单选题", "title": "下列不属于选择性必修模块的是？", "options": ["化学反应原理", "物质结构与性质", "有机化学基础", "化学与社会"], "answer": "D", "score": 4}, {"type": "单选题", "title": "2025修订版化学课程突出？", "options": ["减少实验", "绿色化学与课程思政", "取消选修", "唯纸笔测试"], "answer": "B", "score": 4}, {"type": "单选题", "title": "化学学业质量水平级数是？", "options": ["3", "4", "5", "6"], "answer": "C", "score": 4}, {"type": "单选题", "title": "化学必做实验总数为？", "options": ["15", "18", "20", "22"], "answer": "C", "score": 4}, {"type": "单选题", "title": "核心素养中\"科学态度与社会责任\"强调？", "options": ["仅关注分数", "安全意识与可持续发展", "忽略环境问题", "单纯记忆方程式"], "answer": "B", "score": 4}, {"type": "单选题", "title": "选修课程主要功能是？", "options": ["共同基础", "升学预备", "拓展兴趣与特长", "替代必修"], "answer": "C", "score": 4}, {"type": "单选题", "title": "高考参照的化学学业质量是？", "options": ["水平一至二", "水平三至四", "水平五", "不分层级"], "answer": "B", "score": 4}, {"type": "填空题", "title": "必修化学共______学分。", "options": [], "answer": "4", "score": 4}, {"type": "填空题", "title": "选择性必修最多______学分。", "options": [], "answer": "12", "score": 4}, {"type": "填空题", "title": "化学核心素养包含______大方面。", "options": [], "answer": "5", "score": 4}, {"type": "填空题", "title": "\"宏观辨识与微观探析\"属于______素养。", "options": [], "answer": "化学核心", "score": 4}, {"type": "填空题", "title": "必做实验有______个在必修完成。", "options": [], "answer": "10", "score": 4}, {"type": "填空题", "title": "选择性必修必做实验数为______。", "options": [], "answer": "10", "score": 4}, {"type": "填空题", "title": "绿色化学理念贯穿______修订版。", "options": [], "answer": "2025", "score": 4}, {"type": "填空题", "title": "学业质量五级中______级为合格考。", "options": [], "answer": "二", "score": 4}, {"type": "填空题", "title": "化学实验安全属于______素养范畴。", "options": [], "answer": "科学态度", "score": 4}, {"type": "填空题", "title": "课程思政要求挖掘化学史中的______元素。", "options": [], "answer": "育人", "score": 4}, {"type": "简答题", "title": "简述化学五大核心素养，并举例说明如何在实验中培养\"证据推理与模型认知\"。", "options": [], "answer": "五大素养：宏观辨识与微观探析、变化观念与平衡思想、证据推理与模型认知、实验探究与创新意识、科学态度与社会责任。举例：在探究铁盐与亚铁盐转化实验中，依据颜色变化等证据推理反应机理，建立氧化还原模型。", "score": 10}, {"type": "简答题", "title": "2025修订版下，化学教学如何融合\"课程思政\"？", "options": [], "answer": "可引入侯德榜制碱法等本土案例，强调科学家精神；结合污染防治渗透生态文明；在实验教学中培养规范意识与安全责任。", "score": 10}], "生物": [{"type": "填空题", "title": "姓名：", "options": [], "answer": "人工批阅", "score": 0}, {"type": "填空题", "title": "工号/教师编号：", "options": [], "answer": "人工批阅", "score": 0}, {"type": "单选题", "title": "您本次参加的是哪科课标测试？", "options": ["生物", "其他学科"], "answer": "A", "score": 0}, {"type": "单选题", "title": "下列不属于生物学核心素养的是？", "options": ["生命观念", "科学思维", "科学探究", "几何直观"], "answer": "D", "score": 4}, {"type": "单选题", "title": "高中生物课程结构为？", "options": ["必修、选择性必修、选修", "甲、乙、丙", "基础与提高", "理论与实操"], "answer": "A", "score": 4}, {"type": "单选题", "title": "必修生物学学分为？", "options": ["4", "6", "8", "10"], "answer": "A", "score": 4}, {"type": "单选题", "title": "下列不属于选择性必修模块的是？", "options": ["稳态与调节", "生物与环境", "生物技术与社会", "分子与细胞"], "answer": "D", "score": 4}, {"type": "单选题", "title": "2025修订强调？", "options": ["生命伦理与课程思政", "取消实验", "减少模块", "纯记忆"], "answer": "A", "score": 4}, {"type": "单选题", "title": "生物学学业质量水平数为？", "options": ["3", "4", "5", "6"], "answer": "C", "score": 4}, {"type": "单选题", "title": "生物必做实验总数为？", "options": ["15", "18", "20", "22"], "answer": "B", "score": 4}, {"type": "单选题", "title": "\"生命观念\"主要指？", "options": ["刷题速度", "结构与功能等观念", "忽略生态", "仅记术语"], "answer": "B", "score": 4}, {"type": "单选题", "title": "选修课程定位？", "options": ["共同基础", "预备升学", "拓展兴趣", "替代必修"], "answer": "C", "score": 4}, {"type": "单选题", "title": "高考参照水平？", "options": ["一二", "三四", "五", "不参照"], "answer": "B", "score": 4}, {"type": "填空题", "title": "必修生物______学分。", "options": [], "answer": "4", "score": 4}, {"type": "填空题", "title": "选择性必修上限______学分。", "options": [], "answer": "12", "score": 4}, {"type": "填空题", "title": "生物核心素养有______个维度。", "options": [], "answer": "4", "score": 4}, {"type": "填空题", "title": "生物必做实验必修占______个。", "options": [], "answer": "9", "score": 4}, {"type": "填空题", "title": "选择性必修实验______个。", "options": [], "answer": "9", "score": 4}, {"type": "填空题", "title": "生命观念含结构与______观。", "options": [], "answer": "功能", "score": 4}, {"type": "填空题", "title": "2025修订融入______教育。", "options": [], "answer": "思政", "score": 4}, {"type": "填空题", "title": "合格考参照水平______。", "options": [], "answer": "二", "score": 4}, {"type": "填空题", "title": "科学探究需具备______能力。", "options": [], "answer": "实验设计", "score": 4}, {"type": "填空题", "title": "生态学内容体现______观。", "options": [], "answer": "整体", "score": 4}, {"type": "简答题", "title": "阐述生物四大核心素养，并以\"光合作用\"教学说明落实路径。", "options": [], "answer": "生命观念、科学思维、科学探究、社会责任。路径：通过叶绿体结构建立观念；通过影响因素探究发展思维；通过叶片遮光实验培养探究；通过碳中和讨论增强责任。", "score": 10}, {"type": "简答题", "title": "结合修订版，谈生物教学如何渗透生命伦理教育。", "options": [], "answer": "在基因工程、克隆等内容中设计伦理辨析活动；结合生物安全法案例；引导学生在技术应用与伦理间建立平衡认知。", "score": 10}], "数学": [{"type": "填空题", "title": "姓名：", "options": [], "answer": "人工批阅", "score": 0}, {"type": "填空题", "title": "工号/教师编号：", "options": [], "answer": "人工批阅", "score": 0}, {"type": "单选题", "title": "您本次参加的是哪科课标测试？", "options": ["数学", "其他学科"], "answer": "A", "score": 0}, {"type": "单选题", "title": "下列不属于数学核心素养的是？", "options": ["数学抽象", "逻辑推理", "数学建模", "实验观察"], "answer": "D", "score": 4}, {"type": "单选题", "title": "高中数学课程结构为？", "options": ["必修、选择性必修、选修", "算术与几何", "文科理科", "基础拓展"], "answer": "A", "score": 4}, {"type": "单选题", "title": "必修学分？", "options": ["4", "6", "8", "10"], "answer": "B", "score": 4}, {"type": "单选题", "title": "四条主线不含？", "options": ["函数", "几何与代数", "概率与统计", "文学创作"], "answer": "D", "score": 4}, {"type": "单选题", "title": "2025修订加入？", "options": ["人工智能数学教育", "取消建模", "减少推理", "仅计算"], "answer": "A", "score": 4}, {"type": "单选题", "title": "学业质量水平级数？", "options": ["3", "4", "5", "6"], "answer": "C", "score": 4}, {"type": "单选题", "title": "高考参照水平？", "options": ["一二", "三四", "五", "不分层"], "answer": "B", "score": 4}, {"type": "单选题", "title": "数学建模属于？", "options": ["核心素养", "废止", "仅选修", "课外"], "answer": "A", "score": 4}, {"type": "单选题", "title": "选修功能？", "options": ["共同基础", "预备", "拓展", "替必修"], "answer": "C", "score": 4}, {"type": "单选题", "title": "直观想象强调？", "options": ["图形洞察", "死算", "背公式", "忽略空间"], "answer": "A", "score": 4}, {"type": "填空题", "title": "必修数学______学分。", "options": [], "answer": "6", "score": 4}, {"type": "填空题", "title": "选择性必修最多______学分。", "options": [], "answer": "6", "score": 4}, {"type": "填空题", "title": "数学核心素养有______个。", "options": [], "answer": "6", "score": 4}, {"type": "填空题", "title": "四条主线含______。", "options": [], "answer": "函数", "score": 4}, {"type": "填空题", "title": "2025修订融______内容。", "options": [], "answer": "AI", "score": 4}, {"type": "填空题", "title": "合格考水平______级。", "options": [], "answer": "二", "score": 4}, {"type": "填空题", "title": "建模活动属______主线。", "options": [], "answer": "数学建模", "score": 4}, {"type": "填空题", "title": "数据分析为______素养。", "options": [], "answer": "核心", "score": 4}, {"type": "填空题", "title": "教学提示重______过程。", "options": [], "answer": "探究", "score": 4}, {"type": "填空题", "title": "评价需考______能力。", "options": [], "answer": "运算", "score": 4}, {"type": "简答题", "title": "阐述六维核心素养，并以\"函数\"单元说明教学落实。", "options": [], "answer": "抽象、推理、建模、直观、运算、数据。函数教学：从实例抽象概念；用单调性推理论证；建应用题建模；画图直观；求导运算；统计表数据分析。", "score": 10}, {"type": "简答题", "title": "数学课程如何支撑\"科技自立自强\"？", "options": [], "answer": "强化算法初步与建模；引入国产软件案例；在问题解决中训练原始创新所需的数学工具运用能力。", "score": 10}], "物理": [{"type": "填空题", "title": "姓名：", "options": [], "answer": "人工批阅", "score": 0}, {"type": "填空题", "title": "工号/教师编号：", "options": [], "answer": "人工批阅", "score": 0}, {"type": "单选题", "title": "您本次参加的是哪科课标测试？", "options": ["物理", "其他学科"], "answer": "A", "score": 0}, {"type": "单选题", "title": "下列不属于物理学科核心素养的是？", "options": ["物理观念", "科学思维", "实验操作技能", "科学态度与责任"], "answer": "C", "score": 4}, {"type": "单选题", "title": "普通高中物理课程结构分为？", "options": ["必修和选修", "必修、选择性必修和选修", "基础型、拓展型和研究型", "初中段和高中段"], "answer": "B", "score": 4}, {"type": "单选题", "title": "必修课程共有几个学分？", "options": ["4", "6", "8", "10"], "answer": "B", "score": 4}, {"type": "单选题", "title": "物理学是？", "options": ["研究生命现象的科学", "研究物质结构、相互作用和运动规律的自然科学", "研究社会关系的科学", "研究语言表达的科学"], "answer": "B", "score": 4}, {"type": "单选题", "title": "2025修订版新增的重点育人目标是？", "options": ["唯分数论", "科技自立自强与课程思政", "取消实验教学", "减少必修学分"], "answer": "B", "score": 4}, {"type": "单选题", "title": "物理学业质量水平分为几级？", "options": ["3级", "4级", "5级", "6级"], "answer": "C", "score": 4}, {"type": "单选题", "title": "高考物理参照的学业质量层级主要是？", "options": ["水平一、二", "水平三、四", "水平五", "不参照层级"], "answer": "B", "score": 4}, {"type": "单选题", "title": "下列属于选择性必修模块的是？", "options": ["必修1", "选择性必修1 动量守恒", "选修1 物理学与社会发展", "初中物理"], "answer": "B", "score": 4}, {"type": "单选题", "title": "物理必做实验总数为？", "options": ["15", "18", "21", "25"], "answer": "C", "score": 4}, {"type": "单选题", "title": "\"科学探究\"属于物理核心素养的哪个维度？", "options": ["物理观念", "科学思维", "科学态度与责任", "实验探究（科学探究要素）"], "answer": "D", "score": 4}, {"type": "填空题", "title": "必修课程学分共计______学分。", "options": [], "answer": "6", "score": 4}, {"type": "填空题", "title": "选择性必修课程最多可获得______学分。", "options": [], "answer": "12", "score": 4}, {"type": "填空题", "title": "选修课程旨在为学生提供______发展的空间。", "options": [], "answer": "个性化", "score": 4}, {"type": "填空题", "title": "物理核心素养中\"运动与相互作用观念\"属于______素养。", "options": [], "answer": "物理观念", "score": 4}, {"type": "填空题", "title": "2025修订强调要将______融入物理教学。", "options": [], "answer": "课程思政", "score": 4}, {"type": "填空题", "title": "学业质量水平四级对应______考试要求。", "options": [], "answer": "高考", "score": 4}, {"type": "填空题", "title": "必修教材必做实验分布在必修1、必修2和必修______。", "options": [], "answer": "3", "score": 4}, {"type": "填空题", "title": "选择性必修必做实验数为______个。", "options": [], "answer": "9", "score": 4}, {"type": "填空题", "title": "物理学是以______为主要研究手段的自然科学。", "options": [], "answer": "观察和实验", "score": 4}, {"type": "填空题", "title": "物理课程要培养学生______精神和创新能力。", "options": [], "answer": "科学", "score": 4}, {"type": "简答题", "title": "简述物理学科四大核心素养的内涵及其在课堂教学中的落实途径。", "options": [], "answer": "四大核心素养：物理观念、科学思维、科学探究、科学态度与责任。落实途径：通过概念建构形成观念；通过模型与推理论证发展思维；通过实验设计培养探究能力；通过科技成就与伦理讨论涵养责任。", "score": 10}, {"type": "简答题", "title": "结合2025修订版，谈谈物理课程如何体现\"科技自立自强\"。", "options": [], "answer": "应融入我国重大科技成果案例，强化实验探究，渗透工程意识，引导学生认识物理对关键技术突破的支撑作用，增强科技自信与家国情怀。", "score": 10}], "英语": [{"type": "填空题", "title": "姓名：", "options": [], "answer": "人工批阅", "score": 0}, {"type": "填空题", "title": "工号/教师编号：", "options": [], "answer": "人工批阅", "score": 0}, {"type": "单选题", "title": "您本次参加的是哪科课标测试？", "options": ["英语", "其他学科"], "answer": "A", "score": 0}, {"type": "单选题", "title": "下列不属于英语核心素养的是？", "options": ["语言能力", "文化意识", "思维品质", "物理观念"], "answer": "D", "score": 4}, {"type": "单选题", "title": "高中英语课程结构为？", "options": ["必修、选择性必修、选修", "听力与口语", "英式与美式", "初级高级"], "answer": "A", "score": 4}, {"type": "单选题", "title": "必修学分？", "options": ["4", "6", "8", "10"], "answer": "B", "score": 4}, {"type": "单选题", "title": "三大主题语境不含？", "options": ["人与自我", "人与社会", "人与自然", "人与宇宙"], "answer": "D", "score": 4}, {"type": "单选题", "title": "2025修订突出？", "options": ["国际传播与文化自信", "取消写作", "仅学语法", "降词汇"], "answer": "A", "score": 4}, {"type": "单选题", "title": "学业质量水平级数？", "options": ["3", "4", "5", "6"], "answer": "C", "score": 4}, {"type": "单选题", "title": "高考参照水平？", "options": ["一二", "三四", "五", "不参照"], "answer": "B", "score": 4}, {"type": "单选题", "title": "语言能力指？", "options": ["听说读写看", "仅单词量", "翻译古文", "算数"], "answer": "A", "score": 4}, {"type": "单选题", "title": "选修定位？", "options": ["共同基础", "升学预备", "拓展提高", "替代必修"], "answer": "C", "score": 4}, {"type": "单选题", "title": "中华优秀传统文化对外传播属于？", "options": ["课程思政要求", "删除内容", "仅选修三", "不考评"], "answer": "A", "score": 4}, {"type": "填空题", "title": "必修英语______学分。", "options": [], "answer": "6", "score": 4}, {"type": "填空题", "title": "选择性必修上限______学分。", "options": [], "answer": "8", "score": 4}, {"type": "填空题", "title": "主题语境有______类。", "options": [], "answer": "3", "score": 4}, {"type": "填空题", "title": "英语核心素养含______维度。", "options": [], "answer": "4", "score": 4}, {"type": "填空题", "title": "\"人与社会\"含______等子主题。", "options": [], "answer": "历史与文化", "score": 4}, {"type": "填空题", "title": "2025修订强调______传播。", "options": [], "answer": "国际", "score": 4}, {"type": "填空题", "title": "学业二级为______考。", "options": [], "answer": "合格", "score": 4}, {"type": "填空题", "title": "教学建议重视______技能整合。", "options": [], "answer": "听说读写看", "score": 4}, {"type": "填空题", "title": "文化意识含______理解。", "options": [], "answer": "中外", "score": 4}, {"type": "填空题", "title": "测评需关注______素养。", "options": [], "answer": "思维品质", "score": 4}, {"type": "简答题", "title": "说明英语四大核心素养，并以\"传统文化推介\"单元教学设计体现课程思政。", "options": [], "answer": "语言能力、文化意识、思维品质、学习能力。设计：阅读非遗文本练语言；讨论中西差异育文化意识；评析传播路径提思维；自主策划展演促学习能力。", "score": 10}, {"type": "简答题", "title": "修订版下英语如何服务\"人类命运共同体\"构建？", "options": [], "answer": "通过全球议题语篇培养学生国际视野；训练得体对外话语；在跨文化交际中讲好中国故事，促进文明互鉴。", "score": 10}], "语文": [{"type": "填空题", "title": "姓名：", "options": [], "answer": "人工批阅", "score": 0}, {"type": "填空题", "title": "工号/教师编号：", "options": [], "answer": "人工批阅", "score": 0}, {"type": "单选题", "title": "您本次参加的是哪科课标测试？", "options": ["语文", "其他学科"], "answer": "A", "score": 0}, {"type": "单选题", "title": "下列不属于语文核心素养的是？", "options": ["语言建构与运用", "思维发展与提升", "审美鉴赏与创造", "实验探究"], "answer": "D", "score": 4}, {"type": "单选题", "title": "高中语文课程结构为？", "options": ["必修、选择性必修、选修", "阅读与写作", "古诗文与白话文", "必修与拓展"], "answer": "A", "score": 4}, {"type": "单选题", "title": "必修学分？", "options": ["4", "6", "8", "10"], "answer": "C", "score": 4}, {"type": "单选题", "title": "2025修订新增重点是？", "options": ["文化自信与革命文化", "取消整本书阅读", "弱化传统", "纯客观题"], "answer": "A", "score": 4}, {"type": "单选题", "title": "学习任务群总数为？", "options": ["15", "18", "20", "22"], "answer": "B", "score": 4}, {"type": "单选题", "title": "学业质量水平级数为？", "options": ["3", "4", "5", "6"], "answer": "C", "score": 4}, {"type": "单选题", "title": "高考参照水平？", "options": ["一二", "三四", "五", "不分层"], "answer": "B", "score": 4}, {"type": "单选题", "title": "整本书阅读属于？", "options": ["学习任务群之一", "废止内容", "仅选修", "课外随意"], "answer": "A", "score": 4}, {"type": "单选题", "title": "必修模块名称为？", "options": ["必修 上下", "选修1", "大学语文", "国学基础"], "answer": "A", "score": 4}, {"type": "单选题", "title": "革命文化内容要求？", "options": ["渗透教学", "删除", "仅讲座", "不考评"], "answer": "A", "score": 4}, {"type": "填空题", "title": "必修语文______学分。", "options": [], "answer": "8", "score": 4}, {"type": "填空题", "title": "选择性必修最多______学分。", "options": [], "answer": "6", "score": 4}, {"type": "填空题", "title": "学习任务群有______个。", "options": [], "answer": "18", "score": 4}, {"type": "填空题", "title": "语文核心素养含______个方面。", "options": [], "answer": "4", "score": 4}, {"type": "填空题", "title": "2025修订强化______自信。", "options": [], "answer": "文化", "score": 4}, {"type": "填空题", "title": "整本书阅读在______任务群首位。", "options": [], "answer": "学习", "score": 4}, {"type": "填空题", "title": "必修教材分______册。", "options": [], "answer": "2", "score": 4}, {"type": "填空题", "title": "学业水平五级的合格考为______级。", "options": [], "answer": "二", "score": 4}, {"type": "填空题", "title": "革命文化属______传承内容。", "options": [], "answer": "中华", "score": 4}, {"type": "填空题", "title": "教学建议强调______阅读。", "options": [], "answer": "整本书", "score": 4}, {"type": "简答题", "title": "简述语文四大核心素养，并以《红楼梦》整本书阅读说明教学策略。", "options": [], "answer": "语言建构与运用、思维发展与提升、审美鉴赏与创造、文化传承与理解。策略：以人物关系图建构语言网络；以悲剧成因提升思维；以诗词赏析培养审美；以封建衰亡理解文化。", "score": 10}, {"type": "简答题", "title": "2025修订下，语文如何落实\"文化自信\"？", "options": [], "answer": "增加革命传统作品比重；强化中华优秀传统文化当代价值阐释；在教学中引导学生认同民族话语体系，抵制历史虚无主义。", "score": 10}]};
+
+const SUBJECT_ICONS = {
+  "语文": "📖", "数学": "📐", "英语": "🌍",
+  "物理": "⚛️", "化学": "🧪", "生物": "🧬", "地理": "🌏"
+};
+
+let currentSubject = null;
+let currentQuestions = [];
+
+function showHome() {
+  currentSubject = null;
+  let html = `
+<div class="home-container">
+  <div class="home-header">
+    <h1>入职教师课标测试</h1>
+    <p>请选择您要参加的学科测试</p>
+  </div>
+  <div class="subject-grid">`;
+  for (let s of Object.keys(SUBJECT_DATA)) {
+    html += `
+    <div class="subject-card" onclick="startTest('${s}')">
+      <div class="icon">${SUBJECT_ICONS[s] || '📝'}</div>
+      <div class="name">${s}</div>
+      <div class="info">${SUBJECT_DATA[s].length} 题 · 满分 92 分</div>
+    </div>`;
+  }
+  html += `</div></div>`;
+  document.getElementById('app').innerHTML = html;
+  window.scrollTo(0, 0);
+}
+
+function startTest(subject) {
+  currentSubject = subject;
+  currentQuestions = SUBJECT_DATA[subject];
+  let html = `
+<div class="test-container">
+  <div class="test-header">
+    <h2>${SUBJECT_ICONS[subject] || ''} ${subject} - 课标测试</h2>
+    <button class="back-btn" onclick="showHome()">← 返回首页</button>
+  </div>`;
+
+  // Group questions by type
+  let singleChoice = [];
+  let fillBlank = [];
+  let shortAnswer = [];
+  let infoItems = [];
+
+  for (let q of currentQuestions) {
+    if (q.score === 0) {
+      infoItems.push(q);
+    } else if (q.type === '单选题') {
+      singleChoice.push(q);
+    } else if (q.type === '填空题') {
+      fillBlank.push(q);
+    } else if (q.type === '简答题') {
+      shortAnswer.push(q);
+    }
+  }
+
+  // Info section (name, ID, subject confirm)
+  if (infoItems.length > 0) {
+    html += `<div class="section">
+      <div class="section-title">考生信息</div>`;
+    for (let i = 0; i < infoItems.length; i++) {
+      let q = infoItems[i];
+      let idx = currentQuestions.indexOf(q);
+      html += `<div class="question">
+        <div class="q-title">${idx + 1}. ${q.title}</div>`;
+      if (q.type === '填空题') {
+        html += `<input type="text" class="input-field" id="q_${idx}" placeholder="请输入">`;
+      } else if (q.type === '单选题') {
+        html += `<div class="options">`;
+        for (let j = 0; j < q.options.length; j++) {
+          let letter = String.fromCharCode(65 + j);
+          html += `<label><input type="radio" name="q_${idx}" value="${letter}"> ${letter}. ${q.options[j]}</label>`;
+        }
+        html += `</div>`;
+      }
+      html += `</div>`;
+    }
+    html += `</div>`;
+  }
+
+  // Single choice section
+  if (singleChoice.length > 0) {
+    html += `<div class="section">
+      <div class="section-title">一、单选题（每题 4 分，共 ${singleChoice.length * 4} 分）</div>`;
+    for (let q of singleChoice) {
+      let idx = currentQuestions.indexOf(q);
+      html += `<div class="question">
+        <div class="q-title">${idx + 1}. ${q.title} <span class="q-score">(${q.score}分)</span></div>
+        <div class="options">`;
+      for (let j = 0; j < q.options.length; j++) {
+        let letter = String.fromCharCode(65 + j);
+        html += `<label><input type="radio" name="q_${idx}" value="${letter}"> ${letter}. ${q.options[j]}</label>`;
+      }
+      html += `</div></div>`;
+    }
+    html += `</div>`;
+  }
+
+  // Fill blank section
+  if (fillBlank.length > 0) {
+    html += `<div class="section">
+      <div class="section-title">二、填空题（每题 4 分，共 ${fillBlank.length * 4} 分）</div>`;
+    for (let q of fillBlank) {
+      let idx = currentQuestions.indexOf(q);
+      html += `<div class="question">
+        <div class="q-title">${idx + 1}. ${q.title} <span class="q-score">(${q.score}分)</span></div>
+        <input type="text" class="input-field" id="q_${idx}" placeholder="请输入答案">
+      </div>`;
+    }
+    html += `</div>`;
+  }
+
+  // Short answer section
+  if (shortAnswer.length > 0) {
+    html += `<div class="section">
+      <div class="section-title">三、简答题（每题 10 分，共 ${shortAnswer.length * 10} 分）</div>`;
+    for (let q of shortAnswer) {
+      let idx = currentQuestions.indexOf(q);
+      html += `<div class="question">
+        <div class="q-title">${idx + 1}. ${q.title} <span class="q-score">(${q.score}分)</span></div>
+        <textarea class="input-field" id="q_${idx}" placeholder="请输入答案（提交后自行对照参考答案）" rows="4"></textarea>
+      </div>`;
+    }
+    html += `</div>`;
+  }
+
+  html += `<div class="submit-wrap">
+    <button class="submit-btn" onclick="submitTest()">提交答卷</button>
+  </div>
+  <div id="result"></div>
+</div>`;
+
+  document.getElementById('app').innerHTML = html;
+  window.scrollTo(0, 0);
+}
+
+function submitTest() {
+  let totalScore = 0;
+  let scoredQuestions = currentQuestions.filter(q => q.score > 0);
+  let autoScoreTotal = 0;
+  let autoScoreGot = 0;
+  let corrections = [];
+  let shortAnswerRefs = [];
+
+  for (let q of currentQuestions) {
+    let idx = currentQuestions.indexOf(q);
+    if (q.score === 0) continue;
+
+    if (q.type === '单选题') {
+      autoScoreTotal += q.score;
+      let radios = document.getElementsByName('q_' + idx);
+      let selected = null;
+      for (let r of radios) {
+        if (r.checked) { selected = r.value; break; }
+      }
+      if (selected === q.answer) {
+        autoScoreGot += q.score;
+        corrections.push({ title: q.title, correct: true, your: selected, answer: q.answer });
+      } else {
+        corrections.push({ title: q.title, correct: false, your: selected || '未作答', answer: q.answer });
+      }
+    } else if (q.type === '填空题') {
+      autoScoreTotal += q.score;
+      let input = document.getElementById('q_' + idx);
+      let val = (input?.value || '').trim();
+      // Normalize comparison
+      let ans = q.answer.trim();
+      let correct = val === ans || val === ans.replace(/\s/g, '') || val.replace(/\s/g, '') === ans;
+      if (correct) {
+        autoScoreGot += q.score;
+        corrections.push({ title: q.title, correct: true, your: val || '(空)', answer: ans });
+      } else {
+        corrections.push({ title: q.title, correct: false, your: val || '(空)', answer: ans });
+      }
+    } else if (q.type === '简答题') {
+      shortAnswerRefs.push({ title: q.title, score: q.score, answer: q.answer });
+    }
+  }
+
+  totalScore = autoScoreGot;
+
+  let totalFull = 0;
+  for (let q of scoredQuestions) {
+    totalFull += q.score;
+  }
+
+  let resultHtml = `<div class="result-box">
+    <h3>测试结果</h3>
+    <div class="result-score">${autoScoreGot} / ${autoScoreTotal}</div>
+    <div class="result-detail">
+      自动评分：<span class="${autoScoreGot >= autoScoreTotal * 0.6 ? 'correct' : 'wrong'}">${autoScoreGot} 分</span> /
+      自动评分满分 ${autoScoreTotal} 分
+    </div>`;
+
+  if (shortAnswerRefs.length > 0) {
+    resultHtml += `<div style="margin-top:8px;font-size:13px;color:#999;">
+      简答题（${shortAnswerRefs.map(r=>r.score).reduce((a,b)=>a+b,0)} 分）需自行对照参考答案评分，不计入自动评分
+    </div>`;
+  }
+
+  // Corrections
+  if (corrections.length > 0) {
+    resultHtml += `<div class="ref-answer"><h4>答题明细</h4>`;
+    for (let c of corrections) {
+      let icon = c.correct ? '✓' : '✗';
+      let cls = c.correct ? 'correct' : 'wrong';
+      resultHtml += `<div class="correction-item">
+        <span class="${cls}">${icon}</span> ${c.title}<br>
+        <span style="font-size:12px;color:#888;">你的答案：${c.your} | 正确答案：${c.answer}</span>
+      </div>`;
+    }
+    resultHtml += `</div>`;
+  }
+
+  // Short answer references
+  if (shortAnswerRefs.length > 0) {
+    resultHtml += `<div class="ref-answer"><h4>简答题参考答案</h4>`;
+    for (let r of shortAnswerRefs) {
+      resultHtml += `<div class="ref-item">
+        <div class="ref-q">${r.title}（${r.score}分）</div>
+        <div class="ref-a">${r.answer}</div>
+      </div>`;
+    }
+    resultHtml += `</div>`;
+  }
+
+  resultHtml += `</div>`;
+
+  document.getElementById('result').innerHTML = resultHtml;
+  document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+}
+
+// Init
+showHome();
+</script>
+</body>
+</html>
