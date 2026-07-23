@@ -851,11 +851,23 @@ async function exportCSV() {
   showToast('CSV 已导出');
 }
 
-function clearAllData() {
+async function clearAllData() {
   if (!confirm('确定要清空所有测试成绩数据吗？此操作不可恢复！')) return;
-  if (!confirm('再次确认：清空所有 localStorage 中的成绩记录？')) return;
+  if (!confirm('再次确认：将清空本地与云端全部成绩记录？')) return;
+
+  // 清空本地
   localStorage.removeItem('test_records');
-  showToast('数据已清空');
+  localStorage.removeItem('pending_sync');
+
+  // 清空云端
+  try {
+    const { error } = await supabase.from('scores').delete().neq('id', 0);
+    if (error) console.warn('云端清空失败:', error.message);
+  } catch (e) {
+    console.warn('云端清空异常:', e);
+  }
+
+  showToast('本地与云端数据已全部清空');
   showDashboard();
 }
 
