@@ -159,6 +159,99 @@ textarea.input-field { min-height: 100px; resize: vertical; }
   .section, .test-header { padding: 16px; }
   .result-score { font-size: 36px; }
 }
+
+/* Admin */
+.admin-entry {
+  text-align: center; margin-top: 30px; padding-bottom: 40px;
+}
+.admin-entry a {
+  color: #aaa; font-size: 12px; text-decoration: none;
+  border-bottom: 1px dashed #ccc;
+  transition: color 0.2s;
+}
+.admin-entry a:hover { color: #666; }
+/* Dashboard */
+.dash-container {
+  max-width: 960px; margin: 0 auto; padding: 30px 20px 60px;
+}
+.dash-header {
+  background: #fff; border-radius: 12px; padding: 20px 28px;
+  margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px;
+}
+.dash-header h2 { font-size: 20px; color: #1a1a2e; }
+.dash-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 14px; margin-bottom: 20px;
+}
+.stat-card {
+  background: #fff; border-radius: 10px; padding: 18px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06); text-align: center;
+}
+.stat-card .stat-num { font-size: 28px; font-weight: 700; color: #4a6cf7; }
+.stat-card .stat-label { font-size: 13px; color: #999; margin-top: 4px; }
+.dash-section {
+  background: #fff; border-radius: 12px; padding: 20px 28px;
+  margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  overflow-x: auto;
+}
+.dash-section h3 { font-size: 16px; color: #333; margin-bottom: 14px; }
+.dash-toolbar {
+  display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap;
+}
+.dash-toolbar select, .dash-toolbar button {
+  padding: 8px 16px; border-radius: 8px; font-size: 13px;
+  border: 1.5px solid #ddd; background: #fff; cursor: pointer;
+}
+.dash-toolbar button { border-color: #4a6cf7; color: #4a6cf7; }
+.dash-toolbar button:hover { background: #f0f4ff; }
+.dash-toolbar button.danger { border-color: #e74c3c; color: #e74c3c; }
+.dash-toolbar button.danger:hover { background: #fef0f0; }
+.dash-table {
+  width: 100%; border-collapse: collapse; font-size: 13px;
+  min-width: 600px;
+}
+.dash-table th, .dash-table td {
+  padding: 10px 12px; text-align: left; border-bottom: 1px solid #eee;
+}
+.dash-table th { background: #f8f9fc; font-weight: 600; color: #555; white-space: nowrap; }
+.dash-table tr:hover td { background: #fafbff; }
+.dash-table .score-high { color: #27ae60; font-weight: 600; }
+.dash-table .score-mid { color: #f39c12; font-weight: 600; }
+.dash-table .score-low { color: #e74c3c; font-weight: 600; }
+.empty-state {
+  text-align: center; padding: 40px 20px; color: #999; font-size: 14px;
+}
+/* Login modal */
+.login-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.4); display: flex; align-items: center;
+  justify-content: center; z-index: 1000;
+}
+.login-box {
+  background: #fff; border-radius: 12px; padding: 32px 28px;
+  width: 340px; max-width: 90vw; box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+}
+.login-box h3 { font-size: 18px; margin-bottom: 16px; text-align: center; }
+.login-box .input-field { margin-bottom: 12px; }
+.login-box .btn-row { display: flex; gap: 10px; margin-top: 16px; }
+.login-box .btn-row button { flex: 1; padding: 10px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-weight: 600; }
+.login-box .btn-primary { background: #4a6cf7; color: #fff; }
+.login-box .btn-cancel { background: #eef0f7; color: #555; }
+.login-box .error-msg { color: #e74c3c; font-size: 12px; text-align: center; margin-top: 4px; }
+/* Password change */
+.pwd-row { display: flex; gap: 10px; margin-top: 10px; align-items: center; }
+.pwd-row input { flex: 1; }
+.pwd-row button { white-space: nowrap; }
+.toast {
+  position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+  background: #333; color: #fff; padding: 10px 24px;
+  border-radius: 8px; font-size: 14px; z-index: 2000;
+  opacity: 0; transition: opacity 0.3s;
+}
+.toast.show { opacity: 1; }
 </style>
 </head>
 <body>
@@ -193,7 +286,11 @@ function showHome() {
       <div class="info">${SUBJECT_DATA[s].length} 题 · 满分 92 分</div>
     </div>`;
   }
-  html += `</div></div>`;
+  html += `</div>
+    <div class="admin-entry">
+      <a href="javascript:void(0)" onclick="showAdminLogin()">成绩管理</a>
+    </div>
+  </div>`;
   document.getElementById('app').innerHTML = html;
   window.scrollTo(0, 0);
 }
@@ -400,6 +497,269 @@ function submitTest() {
 
   document.getElementById('result').innerHTML = resultHtml;
   document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+
+  // Save result to localStorage
+  saveResult();
+}
+
+function saveResult() {
+  // Get user info
+  let nameEl = document.getElementById('q_0');
+  let idEl = document.getElementById('q_1');
+  let name = (nameEl?.value || '').trim() || '未填写';
+  let empId = (idEl?.value || '').trim() || '未填写';
+
+  // Calculate auto scores
+  let autoScoreTotal = 0, autoScoreGot = 0;
+  let singleGot = 0, singleTotal = 0;
+  let fillGot = 0, fillTotal = 0;
+
+  for (let q of currentQuestions) {
+    let idx = currentQuestions.indexOf(q);
+    if (q.score === 0) continue;
+    if (q.type === '单选题') {
+      singleTotal += q.score;
+      autoScoreTotal += q.score;
+      let radios = document.getElementsByName('q_' + idx);
+      let selected = null;
+      for (let r of radios) { if (r.checked) { selected = r.value; break; } }
+      if (selected === q.answer) { autoScoreGot += q.score; singleGot += q.score; }
+    } else if (q.type === '填空题') {
+      fillTotal += q.score;
+      autoScoreTotal += q.score;
+      let input = document.getElementById('q_' + idx);
+      let val = (input?.value || '').trim();
+      let ans = q.answer.trim();
+      if (val === ans || val === ans.replace(/\s/g, '') || val.replace(/\s/g, '') === ans) {
+        autoScoreGot += q.score; fillGot += q.score;
+      }
+    }
+  }
+
+  let record = {
+    name: name,
+    empId: empId,
+    subject: currentSubject,
+    score: autoScoreGot,
+    maxScore: autoScoreTotal,
+    singleScore: singleGot + '/' + singleTotal,
+    fillScore: fillGot + '/' + fillTotal,
+    time: new Date().toLocaleString('zh-CN')
+  };
+
+  let records = JSON.parse(localStorage.getItem('test_records') || '[]');
+  records.push(record);
+  localStorage.setItem('test_records', JSON.stringify(records));
+}
+
+// ===== Admin Panel =====
+let ADMIN_PASSWORD = localStorage.getItem('admin_password') || '123456';
+
+function showAdminLogin() {
+  let html = `
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <h3>成绩管理登录</h3>
+    <input type="password" class="input-field" id="adminPwd" placeholder="请输入管理密码" onkeydown="if(event.key==='Enter')verifyAdmin()">
+    <div class="error-msg" id="loginError"></div>
+    <div class="btn-row">
+      <button class="btn-cancel" onclick="closeAdminLogin()">取消</button>
+      <button class="btn-primary" onclick="verifyAdmin()">确认</button>
+    </div>
+  </div>
+</div>`;
+  document.getElementById('app').insertAdjacentHTML('beforeend', html);
+  setTimeout(() => document.getElementById('adminPwd').focus(), 100);
+}
+
+function closeAdminLogin() {
+  let overlay = document.getElementById('loginOverlay');
+  if (overlay) overlay.remove();
+}
+
+function verifyAdmin() {
+  let pwd = document.getElementById('adminPwd').value;
+  if (pwd === ADMIN_PASSWORD) {
+    closeAdminLogin();
+    showDashboard();
+  } else {
+    document.getElementById('loginError').textContent = '密码错误，请重试';
+  }
+}
+
+function showDashboard() {
+  let records = JSON.parse(localStorage.getItem('test_records') || '[]');
+
+  // Filter
+  let filterSubject = (new URLSearchParams(window.location.search)).get('filter') || '全部';
+
+  let html = `
+<div class="dash-container">
+  <div class="dash-header">
+    <h2>成绩管理面板</h2>
+    <button class="back-btn" onclick="showHome()">← 返回首页</button>
+  </div>`;
+
+  // Stats
+  if (records.length > 0) {
+    let filtered = filterSubject === '全部' ? records : records.filter(r => r.subject === filterSubject);
+
+    // Overall stats
+    let scores = filtered.map(r => r.score);
+    let avgScore = scores.length > 0 ? (scores.reduce((a,b)=>a+b,0) / scores.length).toFixed(1) : 0;
+    let maxScore = scores.length > 0 ? Math.max(...scores) : 0;
+    let minScore = scores.length > 0 ? Math.min(...scores) : 0;
+
+    // Per subject stats
+    let subjStats = {};
+    for (let r of records) {
+      if (!subjStats[r.subject]) subjStats[r.subject] = [];
+      subjStats[r.subject].push(r.score);
+    }
+
+    html += `<div class="dash-stats">
+      <div class="stat-card">
+        <div class="stat-num">${records.length}</div>
+        <div class="stat-label">总提交数</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">${avgScore}</div>
+        <div class="stat-label">平均分（当前筛选）</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">${maxScore}</div>
+        <div class="stat-label">最高分</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">${minScore}</div>
+        <div class="stat-label">最低分</div>
+      </div>`;
+
+    for (let [subj, sc] of Object.entries(subjStats)) {
+      let avg = (sc.reduce((a,b)=>a+b,0) / sc.length).toFixed(1);
+      html += `<div class="stat-card">
+        <div class="stat-num" style="font-size:22px;">${avg}</div>
+        <div class="stat-label">${subj} 平均分 (${sc.length}人)</div>
+      </div>`;
+    }
+    html += `</div>`;
+
+    // Table
+    let displayRecords = filterSubject === '全部' ? records : records.filter(r => r.subject === filterSubject);
+    displayRecords.reverse(); // newest first
+
+    html += `<div class="dash-section">
+      <h3>提交记录</h3>
+      <div class="dash-toolbar">
+        <select id="subjectFilter" onchange="applyFilter()">
+          <option value="全部" ${filterSubject==='全部'?'selected':''}>全部学科</option>`;
+    for (let s of Object.keys(SUBJECT_DATA)) {
+      html += `<option value="${s}" ${filterSubject===s?'selected':''}>${s}</option>`;
+    }
+    html += `</select>
+        <button onclick="exportCSV()">导出 CSV</button>
+        <button class="danger" onclick="clearAllData()">清空数据</button>
+      </div>
+      <table class="dash-table">
+        <thead><tr>
+          <th>#</th><th>姓名</th><th>工号</th><th>学科</th><th>得分</th><th>单选</th><th>填空</th><th>提交时间</th>
+        </tr></thead>
+        <tbody>`;
+
+    for (let i = 0; i < displayRecords.length; i++) {
+      let r = displayRecords[i];
+      let pct = r.maxScore > 0 ? (r.score / r.maxScore * 100) : 0;
+      let cls = pct >= 80 ? 'score-high' : (pct >= 60 ? 'score-mid' : 'score-low');
+      html += `<tr>
+        <td>${i + 1}</td>
+        <td>${escHtml(r.name)}</td>
+        <td>${escHtml(r.empId)}</td>
+        <td>${r.subject}</td>
+        <td class="${cls}">${r.score} / ${r.maxScore}</td>
+        <td>${r.singleScore || '-'}</td>
+        <td>${r.fillScore || '-'}</td>
+        <td>${r.time}</td>
+      </tr>`;
+    }
+
+    html += `</tbody></table></div>`;
+  } else {
+    html += `<div class="dash-section">
+      <div class="empty-state">暂无提交记录</div>
+    </div>`;
+  }
+
+  // Password management
+  html += `<div class="dash-section">
+    <h3>安全设置</h3>
+    <div class="pwd-row">
+      <span style="font-size:14px;color:#666;">管理密码：</span>
+      <input type="text" class="input-field" id="newPassword" placeholder="输入新密码" style="max-width:200px;">
+      <button onclick="changePassword()" style="padding:8px 16px;border-radius:8px;background:#4a6cf7;color:#fff;border:none;cursor:pointer;">修改密码</button>
+    </div>
+    <div style="font-size:12px;color:#999;margin-top:6px;">修改后请妥善保管新密码</div>
+  </div>`;
+
+  html += `</div>`;
+
+  document.getElementById('app').innerHTML = html;
+  window.scrollTo(0, 0);
+}
+
+function applyFilter() {
+  let val = document.getElementById('subjectFilter').value;
+  let url = new URL(window.location);
+  url.searchParams.set('filter', val);
+  window.history.replaceState({}, '', url);
+  showDashboard();
+}
+
+function escHtml(s) {
+  let d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function exportCSV() {
+  let records = JSON.parse(localStorage.getItem('test_records') || '[]');
+  if (records.length === 0) { showToast('暂无数据可导出'); return; }
+  let header = '姓名,工号,学科,得分,满分,单选题得分,填空题得分,提交时间';
+  let rows = records.map(r => `"${r.name}","${r.empId}","${r.subject}",${r.score},${r.maxScore},"${r.singleScore||''}","${r.fillScore||''}","${r.time}"`);
+  let csv = '﻿' + header + '\n' + rows.join('\n');
+  let blob = new Blob([csv], {type: 'text/csv;charset=utf-8'});
+  let url = URL.createObjectURL(blob);
+  let a = document.createElement('a');
+  a.href = url; a.download = '课标测试成绩_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click(); URL.revokeObjectURL(url);
+  showToast('CSV 已导出');
+}
+
+function clearAllData() {
+  if (!confirm('确定要清空所有测试成绩数据吗？此操作不可恢复！')) return;
+  if (!confirm('再次确认：清空所有 localStorage 中的成绩记录？')) return;
+  localStorage.removeItem('test_records');
+  showToast('数据已清空');
+  showDashboard();
+}
+
+function changePassword() {
+  let newPwd = document.getElementById('newPassword').value.trim();
+  if (!newPwd) { showToast('请输入新密码'); return; }
+  if (newPwd.length < 3) { showToast('密码至少 3 位'); return; }
+  ADMIN_PASSWORD = newPwd;
+  localStorage.setItem('admin_password', newPwd);
+  showToast('密码已更新');
+  document.getElementById('newPassword').value = '';
+}
+
+function showToast(msg) {
+  let existing = document.querySelector('.toast');
+  if (existing) existing.remove();
+  let t = document.createElement('div');
+  t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t);
+  requestAnimationFrame(() => t.classList.add('show'));
+  setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 2000);
 }
 
 // Init
