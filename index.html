@@ -252,6 +252,44 @@ textarea.input-field { min-height: 100px; resize: vertical; }
   opacity: 0; transition: opacity 0.3s;
 }
 .toast.show { opacity: 1; }
+
+/* Anti-cheat */
+.anti-cheat-banner {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 999;
+  background: #fff3cd; color: #856404; text-align: center;
+  padding: 8px 16px; font-size: 14px; font-weight: 600;
+  border-bottom: 2px solid #ffc107;
+}
+.cheat-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.85); z-index: 9999;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; color: #fff;
+}
+.cheat-overlay .cheat-icon { font-size: 48px; margin-bottom: 16px; }
+.cheat-overlay .cheat-text { font-size: 20px; font-weight: 600; margin-bottom: 8px; }
+.cheat-overlay .cheat-sub { font-size: 14px; color: #ccc; }
+.cheat-overlay .cheat-btn {
+  margin-top: 20px; padding: 10px 32px; border-radius: 8px;
+  background: #ffc107; color: #333; border: none;
+  font-size: 15px; font-weight: 600; cursor: pointer;
+}
+.cheat-warning-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.7); z-index: 10000;
+  display: flex; align-items: center; justify-content: center;
+}
+.cheat-warning-box {
+  background: #fff; border-radius: 12px; padding: 32px 28px;
+  max-width: 400px; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+.cheat-warning-box h3 { color: #e74c3c; font-size: 18px; margin-bottom: 12px; }
+.cheat-warning-box p { color: #555; font-size: 14px; margin-bottom: 8px; line-height: 1.6; }
+.cheat-warning-box button {
+  margin-top: 16px; padding: 10px 32px; border-radius: 8px;
+  background: #4a6cf7; color: #fff; border: none;
+  font-size: 15px; font-weight: 600; cursor: pointer;
+}
 </style>
 </head>
 <body>
@@ -274,8 +312,111 @@ const SUBJECT_ICONS = {
 
 let currentSubject = null;
 let currentQuestions = [];
+let tabSwitchCount = 0;
+let testActive = false;
+let cheatWarningShown = false;
+
+// ===== Anti-Cheat =====
+// 1. 禁止右键和复制
+document.addEventListener('contextmenu', function(e) {
+  if (testActive) { e.preventDefault(); return false; }
+});
+document.addEventListener('selectstart', function(e) {
+  if (testActive) { e.preventDefault(); return false; }
+});
+document.addEventListener('copy', function(e) {
+  if (testActive) { e.preventDefault(); return false; }
+});
+document.addEventListener('cut', function(e) {
+  if (testActive) { e.preventDefault(); return false; }
+});
+document.addEventListener('keydown', function(e) {
+  if (!testActive) return;
+  if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
+    e.preventDefault(); return false;
+  }
+  if (e.ctrlKey && (e.key === 'c' || e.key === 'v' || e.key === 'u')) {
+    e.preventDefault(); return false;
+  }
+});
+
+// 2. 切出页面检测
+function showCheatOverlay() {
+  let existing = document.getElementById('cheatOverlay');
+  if (existing) return;
+  let div = document.createElement('div');
+  div.id = 'cheatOverlay';
+  div.className = 'cheat-overlay';
+  div.innerHTML = '<div class="cheat-icon">&#x26A0;</div>' +
+    '<div class="cheat-text">请勿切换页面，系统已记录</div>' +
+    '<div class="cheat-sub">切出次数：' + tabSwitchCount + ' 次</div>' +
+    '<button class="cheat-btn" onclick="hideCheatOverlay()">返回答题</button>';
+  document.body.appendChild(div);
+}
+
+function hideCheatOverlay() {
+  let overlay = document.getElementById('cheatOverlay');
+  if (overlay) overlay.remove();
+}
+
+function showCheatWarning() {
+  if (cheatWarningShown) return;
+  cheatWarningShown = true;
+  let div = document.createElement('div');
+  div.id = 'cheatWarning';
+  div.className = 'cheat-warning-overlay';
+  div.innerHTML = '<div class="cheat-warning-box">' +
+    '<h3>&#x26A0; 切屏警告</h3>' +
+    '<p>您已切换页面超过 <b>3 次</b>，系统已记录此行为。</p>' +
+    '<p>频繁切屏可能被视为作弊行为，请专注答题。</p>' +
+    '<button onclick="this.closest(\'.cheat-warning-overlay\').remove()">我知道了</button>' +
+    '</div>';
+  document.body.appendChild(div);
+}
+
+document.addEventListener('visibilitychange', function() {
+  if (!testActive) return;
+  if (document.hidden) {
+    tabSwitchCount++;
+    showCheatOverlay();
+    if (tabSwitchCount > 3) {
+      setTimeout(showCheatWarning, 500);
+    }
+  }
+});
+
+window.addEventListener('blur', function() {
+  if (!testActive) return;
+  tabSwitchCount++;
+  showCheatOverlay();
+  if (tabSwitchCount > 3) {
+    setTimeout(showCheatWarning, 500);
+  }
+});
+
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1));
+    let tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+  }
+}
+
+function endTest() {
+  testActive = false;
+  let oldOverlay = document.getElementById('cheatOverlay');
+  if (oldOverlay) oldOverlay.remove();
+  let oldWarning = document.getElementById('cheatWarning');
+  if (oldWarning) oldWarning.remove();
+  showHome();
+}
 
 function showHome() {
+  testActive = false;
+  tabSwitchCount = 0;
+  let oldOverlay = document.getElementById('cheatOverlay');
+  if (oldOverlay) oldOverlay.remove();
+  let oldWarning = document.getElementById('cheatWarning');
+  if (oldWarning) oldWarning.remove();
   currentSubject = null;
   let html = `
 <div class="home-container">
@@ -303,12 +444,60 @@ function showHome() {
 
 function startTest(subject) {
   currentSubject = subject;
-  currentQuestions = SUBJECT_DATA[subject];
+  testActive = true;
+  tabSwitchCount = 0;
+  cheatWarningShown = false;
+  // Remove any lingering overlay
+  let oldOverlay = document.getElementById('cheatOverlay');
+  if (oldOverlay) oldOverlay.remove();
+  let oldWarning = document.getElementById('cheatWarning');
+  if (oldWarning) oldWarning.remove();
+
+  // Deep copy and shuffle
+  let rawQuestions = JSON.parse(JSON.stringify(SUBJECT_DATA[subject]));
+
+  // Separate by type
+  let infoItems = [], singleChoice = [], fillBlank = [], shortAnswer = [];
+  for (let q of rawQuestions) {
+    if (q.score === 0) infoItems.push(q);
+    else if (q.type === '单选题') singleChoice.push(q);
+    else if (q.type === '填空题') fillBlank.push(q);
+    else if (q.type === '简答题') shortAnswer.push(q);
+  }
+
+  // 3. 随机排序单选题和填空题
+  shuffleArray(singleChoice);
+  shuffleArray(fillBlank);
+
+  // 4. 随机排列单选题选项（答案对应调整）
+  for (let q of singleChoice) {
+    // Build mapping: original index -> option text
+    let pairs = q.options.map(function(opt, i) {
+      return { text: opt, letter: String.fromCharCode(65 + i) };
+    });
+    let originalAnswerLetter = q.answer;
+    let originalAnswerIndex = originalAnswerLetter.charCodeAt(0) - 65;
+    let answerText = q.options[originalAnswerIndex];
+    shuffleArray(pairs);
+    q.options = pairs.map(function(p) { return p.text; });
+    // Find new letter for answer
+    for (let i = 0; i < pairs.length; i++) {
+      if (pairs[i].text === answerText) {
+        q.answer = String.fromCharCode(65 + i);
+        break;
+      }
+    }
+  }
+
+  // Reassemble: infoItems -> singleChoice -> fillBlank -> shortAnswer
+  currentQuestions = infoItems.concat(singleChoice, fillBlank, shortAnswer);
+
   let html = `
 <div class="test-container">
-  <div class="test-header">
+  <div class="anti-cheat-banner">诚信考试，系统将记录切屏行为</div>
+  <div class="test-header" style="margin-top:42px;">
     <h2>${SUBJECT_ICONS[subject] || ''} ${subject} - 课标测试</h2>
-    <button class="back-btn" onclick="showHome()">← 返回首页</button>
+    <button class="back-btn" onclick="endTest()">← 返回首页</button>
   </div>`;
 
   // Group questions by type
@@ -410,6 +599,7 @@ function startTest(subject) {
 }
 
 function submitTest() {
+  testActive = false;
   let totalScore = 0;
   let scoredQuestions = currentQuestions.filter(q => q.score > 0);
   let autoScoreTotal = 0;
@@ -550,6 +740,7 @@ function saveResult() {
     maxScore: autoScoreTotal,
     singleScore: singleGot + '/' + singleTotal,
     fillScore: fillGot + '/' + fillTotal,
+    tabSwitches: tabSwitchCount,
     time: new Date().toLocaleString('zh-CN')
   };
 
@@ -565,7 +756,8 @@ function saveResult() {
       subject: currentSubject,
       score: autoScoreGot,
       choice_score: singleGot,
-      fill_score: fillGot
+      fill_score: fillGot,
+      tab_switches: tabSwitchCount
     }).then(({ error }) => {
       if (error) {
         console.warn('Supabase 写入失败，已降级到 localStorage:', error.message);
@@ -627,7 +819,8 @@ async function syncPendingToSupabase() {
       subject: r.subject,
       score: r.score,
       choice_score: parseInt((r.singleScore || '0').split('/')[0]) || 0,
-      fill_score: parseInt((r.fillScore || '0').split('/')[0]) || 0
+      fill_score: parseInt((r.fillScore || '0').split('/')[0]) || 0,
+      tab_switches: r.tabSwitches || 0
     });
     if (error) { failed++; } else { synced++; }
   }
