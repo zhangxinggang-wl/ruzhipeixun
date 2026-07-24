@@ -501,10 +501,10 @@ function startTest(subject) {
   </div>`;
 
   // Group questions by type
-  let singleChoice = [];
-  let fillBlank = [];
-  let shortAnswer = [];
-  let infoItems = [];
+  singleChoice = [];
+  fillBlank = [];
+  shortAnswer = [];
+  infoItems = [];
 
   for (let q of currentQuestions) {
     if (q.score === 0) {
